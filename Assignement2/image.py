@@ -81,8 +81,7 @@ def compress(filename, r, plot=False, sigma=False):
         print('Compression ratio', ratio)
     except FileNotFoundError:
         print('Compressing image ...')
-        #u,d,v = np.linalg.svd(img,compute_uv=True)
-        u,d,v = svd(np.asarray(img))
+        u,d,v = np.linalg.svd(img,compute_uv=True)
         if u.shape[0] > v.shape[0]:
             S = (np.concatenate((np.diag(d), np.zeros((np.abs(u.shape[0]-u.shape[0]), v.shape[0]))), axis=0))
         if u.shape[0] < v.shape[0]:
@@ -112,46 +111,3 @@ def compress(filename, r, plot=False, sigma=False):
         show(compressed)
         plt.title('Compressed r = {}'.format(r))
         
-def svd(A, sing_mat=False):
-    """ 
-    Factorize a matrix A = USV.T
-    """
-    if A.shape[1] < A.shape[0]:
-        A = A.T
-    n = A.shape[1]
-    m = A.shape[0]
-    k = np.abs(n-m)
-    d1, u = np.linalg.eigh(A@A.T)
-    d2, v = np.linalg.eigh(A.T@A)
-    D = -np.sort(-d1) #Get diagonal elements in descending order
-    print(D)
-    print(min(n,m))
-    
-    # make i > n-k elements equal to 0 if precision is bad
-    #if n != m:
-    #    for i in range(k):
-    #        D[min(n,m)+i] = 0
-    # Need to sort u in the order of 
-    # descending sort of eigenvalues d1
-    U = np.zeros_like(u)
-    for i in range(u.shape[0]):
-        if n != m and i > max(n,m)-k: #For nxm matrices
-            U.T[i] = u.T[np.argsort(-d1)[i-max(n,m)-k]]
-        U.T[i] = u.T[np.argsort(-d1)[i]]
-                
-    # Need to sort v in the order of 
-    # descending sort of eigenvalues d2        
-    V = np.zeros_like(v)
-    for i in range(v.shape[0]):
-        V.T[i] = v.T[np.argsort(-d2)[i]]
-    print(np.sqrt(D).shape)
-    print(np.zeros((np.abs(V.shape[0]-U.shape[0]), Vpri.shape[0])).shape)
-    S = (np.concatenate((np.sqrt(D), np.zeros((np.abs(V.shape[0]-U.shape[0]), V.shape[0]))), axis=0))          
-#    if sing_mat:
-#        S = np.diagflat(np.sqrt(D)) # singular values, sqrt(d) are the diagonal elements of a matrix
-#    if sing_mat == False:
-#             S = np.sqrt(D)
-    if n != m:
-        return U, S[:,:min(m,n)], V.T
-    else:
-        return U, S, V.T
