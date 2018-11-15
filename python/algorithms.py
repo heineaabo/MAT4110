@@ -155,3 +155,35 @@ def back(U,b):
             x[i] -= (U[i][j]*x[j])
         x[i] = x[i]/U[i][i]
     return x
+
+####################################
+########## Interpolation ###########
+####################################
+
+def Lagrange_interpole(F,num):
+    """
+    Take F on shape (x,y)_i (can use np.column_stack):
+    f = np.array([(1,3),(3,4),(5,6),(7,-10)])
+        -> F = [[1,  3],
+                [3,  4],
+                [5,  6],
+                [7,-10]]
+            
+    num = number of points to interpolate
+    Return: X -> x points
+            P -> y points
+    """
+    def L(f,x,k): # Basis
+        B = 1.0
+        #i = - 1
+        for j in range(f.shape[0]):
+            if j != k:
+                B *= (x-X[j]) / (X[k]-X[j])
+        return B
+    fx,f = F.T[0],F.T[1]
+    X = np.linspace(fx[0],fx[-1],num)
+    P = np.zeros_like(X)
+    for i,x in enumerate(X):
+        for k,f_k in enumerate(f):
+            P[i] += f_k*lagrange(fx,x,k)
+    return X,P
