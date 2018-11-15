@@ -173,17 +173,18 @@ def Lagrange_interpole(F,num):
     Return: X -> x points
             P -> y points
     """
-    def L(f,x,k): # Basis
-        B = 1.0
-        #i = - 1
-        for j in range(f.shape[0]):
-            if j != k:
-                B *= (x-X[j]) / (X[k]-X[j])
-        return B
     fx,f = F.T[0],F.T[1]
     X = np.linspace(fx[0],fx[-1],num)
     P = np.zeros_like(X)
     for i,x in enumerate(X):
         for k,f_k in enumerate(f):
-            P[i] += f_k*lagrange(fx,x,k)
+            P[i] += f_k*L(fx,x,k)
     return X,P
+
+def L(f,x,k): # Lagrange Basis
+        B = 1.0
+        #i = - 1
+        for j in range(f.shape[0]):
+            if j != k:
+                B *= (x-f[j]) / (f[k]-f[j])
+        return B
